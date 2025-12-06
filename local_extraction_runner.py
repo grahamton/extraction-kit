@@ -104,8 +104,10 @@ async def run_enrichment_agent(content: str, url: str) -> str:
 
     system_prompt += templates_content
 
-    # Truncate content to avoid context limits (approx 20k chars)
-    user_prompt = f"Extract and enrich the following content from {url}:\n\n{content[:20000]}"
+    # Truncate content to avoid context limits.
+    # User has 8k context. 14000 chars is approx 3500 tokens.
+    # This leaves ~4000 tokens for system prompt + response.
+    user_prompt = f"Extract and enrich the following content from {url}:\n\n{content[:14000]}"
 
     try:
         completion = client.chat.completions.create(
