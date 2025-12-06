@@ -1,0 +1,12 @@
+{
+  "allowed_domains": [
+    "insight.com"
+  ],
+  "ignore_patterns": [
+    "contact",
+    "contact-us",
+    "form"
+  ],
+  "depth_limit": 3,
+  "max_pages": 40
+}
