@@ -44,7 +44,7 @@ Crawl rules
 Extraction rules
 For each selected page or file:
 - use the page, pdf, or media extraction template
-- keep summary at most 200 words
+- keep summary at most 300 words
 - include canonical url and ensure all extracted links are absolute (full http paths)
 - include media text when possible
 - derive 3 to 10 Q and A interactions per resource. **Answers must be quoted or strictly paraphrased from the text.**
