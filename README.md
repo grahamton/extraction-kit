@@ -1,4 +1,4 @@
-# extraction-kit
+# Extraction Kit
 
 A **Local AI + Python** pipeline for turning websites into RAG-ready knowledge chunks. Use this to build high-quality context for chatbots and research assistants.
 
@@ -11,46 +11,58 @@ A **Local AI + Python** pipeline for turning websites into RAG-ready knowledge c
 ## Setup
 
 1.  **Install Dependencies:**
+    You will need Python 3.9+ installed.
     ```bash
     pip install playwright crawlee trafilatura openai pymupdf
     playwright install
     ```
+
 2.  **Start LM Studio:**
-    - Load a vision-capable model (e.g., `qwen2.5-vl-7b`).
+    - Load a vision-capable model (recommended: `qwen2.5-vl-7b`).
     - Start the Local Server on port `1234`.
 
 ## Usage
 
-1.  **Add Targets:**
-    Edit `_01_targets/url-seeds.md` and paste the URLs you want to extract.
-    Configure filters in `_01_targets/config.json`.
+### 1. Batch Extraction
+Process a list of URLs defined in your config.
 
+1.  **Add Targets:**
+    Edit `config/url-seeds.md` and paste the URLs you want to extract (one per line).
 2.  **Run the Pipeline:**
     ```bash
     python local_extraction_runner.py
     ```
 
-3.  **View Results:**
-    Outputs are organized by Timestamped Run ID folders (e.g. `2025-12-06_12-30-00_run`).
-    - **Raw Extracts:** `_02_scrapes_raw/{RunID}/`
-    - **Final Chunks:** `_03_scrapes_clean/{RunID}/`
-    - **Logs:** `_06_logs/run-log.md`
+### 2. Single URL Extraction
+Process a single URL directly from the command line.
 
-## Folder Guide
-- **`_00_system/`**:
-    - **Active Prompt:** `multi-url-agent-prompt.md`. This is the brain of the agent.
-    - **Archive:** Legacy prompts and instructions.
-- **`_01_targets/`**:
-    - `url-seeds.md`: List of URLs to start crawling.
-    - `config.json`: Configuration for ignoring patterns, allowed domains, etc.
-- **`_02_scrapes_raw/`**: Contains the full, unchunked markdown files from each run.
-- **`_03_scrapes_clean/`**: Contains the final, chunked, and enriched metadata files ready for RAG.
-- **`_04_media/`**: Archival storage for downloaded PDFs and images captured during the crawl.
-- **`_05_templates/`**:
-    - Markdown templates injected into the prompt to tell the LLM how to format pages and PDFs.
-- **`_06_logs/`**:
-    - Execution logs tracking success, failure, and run parameters.
-- **`docs/specs/`**:
-    - Technical reference documents and schemas (not active code).
-- **`storage/`**:
-    - Internal temporary cache for the crawler. Safe to delete if you want a fresh "clean slate" crawl.
+```bash
+python local_extraction_runner.py --url https://example.com/page
+```
+
+## Output Structure
+
+All outputs are saved to the `data/` directory.
+
+- **`data/scrapes/{RunID}/raw/`**: Full, enriched markdown files.
+- **`data/scrapes/{RunID}/clean/`**: Final, chunked markdown files with metadata (ready for RAG).
+- **`data/media/{RunID}/`**: Archived PDFs and images.
+- **`data/logs/`**: Execution logs.
+- **`data/manifest.json`**: Master record of all runs and processed URLs.
+
+## Configuration
+
+- **`config/config.json`**: Set ignored patterns (e.g., "contact", "login") and allowed domains.
+- **`config/multi-url-agent-prompt.md`**: The system prompt used by the Local LLM for enrichment.
+- **`templates/`**: Markdown templates (Page, PDF) injected into the prompt to guide the LLM's formatting.
+
+## Project Structure
+
+```
+extraction-kit/
+├── config/                 # Configuration files (seeds, prompt, json)
+├── data/                   # ALL outputs (scrapes, logs, media)
+├── docs/                   # Strategies and guides
+├── templates/              # Prompt templates
+└── local_extraction_runner.py  # Main execution script
+```

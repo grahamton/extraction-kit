@@ -10,23 +10,18 @@ __pycache__/
 .idea/
 .obsidian/
 .agent/
-storage/
+.crawlee/
 
-# Extraction Outputs (Ignore all contents but keep folder)
-_02_scrapes_raw/*
-!_02_scrapes_raw/.keep
-_03_scrapes_clean/*
-!_03_scrapes_clean/.keep
-_04_media/*
-!_04_media/.keep
+# Data & Outputs
+data/
+!data/.keep
+
+# Legacy (Just in case)
+storage/
+_02_scrapes_raw/
+_03_scrapes_clean/
+_04_media/
+_06_logs/
 
 # Logs
-_06_logs/*
-!_06_logs/.keep
-# But we might want to keep the main run log if the user desires history,
-# but usually logs are ignored. User asked to better explain logs.
-# Let's keep `run-log.md` if it exists?
-!_06_logs/run-log.md
-
-# Legacy specific ignores just in case
 *.log

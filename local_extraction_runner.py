@@ -3,6 +3,7 @@ import os
 import json
 import datetime
 import re
+import argparse
 from typing import List, Dict
 
 # Set shared browser path BEFORE importing crawlee/playwright
@@ -12,6 +13,7 @@ os.environ["PLAYWRIGHT_BROWSERS_PATH"] = r"C:\tools\playwright_browsers"
 import requests
 import fitz  # PyMuPDF
 from crawlee.crawlers._playwright import PlaywrightCrawler
+from crawlee.configuration import Configuration
 from typing import Any
 from trafilatura import extract
 from openai import OpenAI
@@ -19,16 +21,18 @@ from openai import OpenAI
 # Configuration
 LM_STUDIO_URL = "http://127.0.0.1:1234/v1"
 MODEL_ID = "qwen/qwen2.5-vl-7b"
-TARGETS_DIR = "_01_targets"
+TARGETS_DIR = "config"
 
 # Dynamic Run Configuration
 TIMESTAMP = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 RUN_ID = f"{TIMESTAMP}_run"
 
-RAW_DIR = os.path.join("_02_scrapes_raw", RUN_ID)
-OUTPUT_DIR = os.path.join("_03_scrapes_clean", RUN_ID)
-MEDIA_DIR = os.path.join("_04_media", RUN_ID)
-LOGS_DIR = "_06_logs"
+# New Storage Structure
+STORAGE_DIR = "data"
+RAW_DIR = os.path.join(STORAGE_DIR, "scrapes", RUN_ID, "raw")
+OUTPUT_DIR = os.path.join(STORAGE_DIR, "scrapes", RUN_ID, "clean")
+MEDIA_DIR = os.path.join(STORAGE_DIR, "media", RUN_ID)
+LOGS_DIR = os.path.join(STORAGE_DIR, "logs")
 
 # Initialize OpenAI Client (points to local LM Studio)
 client = OpenAI(base_url=LM_STUDIO_URL, api_key="lm-studio")
@@ -83,7 +87,7 @@ def extract_text_from_pdf(url: str, slug: str) -> str:
 async def run_enrichment_agent(content: str, url: str) -> str:
     """Sends content to local LLM for enrichment"""
 
-    prompt_path = os.path.join("_00_system", "multi-url-agent-prompt.md")
+    prompt_path = os.path.join("config", "multi-url-agent-prompt.md")
     if os.path.exists(prompt_path):
         with open(prompt_path, "r", encoding="utf-8") as f:
             system_prompt = f.read()
@@ -91,8 +95,8 @@ async def run_enrichment_agent(content: str, url: str) -> str:
         system_prompt = "Enrich the content."
 
     # Load and Inject Templates
-    page_template_path = os.path.join("_05_templates", "page-extraction-template.md")
-    pdf_template_path = os.path.join("_05_templates", "pdf-extraction-template.md")
+    page_template_path = os.path.join("templates", "page-extraction-template.md")
+    pdf_template_path = os.path.join("templates", "pdf-extraction-template.md")
 
     templates_content = "\n\n# TEMPLATES\n"
     if os.path.exists(page_template_path):
@@ -198,14 +202,23 @@ intent: [{intent}]
     })
 
 async def main():
+    parser = argparse.ArgumentParser(description="Local Extraction Runner")
+    parser.add_argument("--url", help="Single URL to scrape (overrides seed file)")
+    args = parser.parse_args()
+
     print(f"Starting Local Extraction Pipeline ({RUN_ID})...")
 
     # Load Config
     config = load_config()
     print(f"Loaded config: {config}")
 
-    seed_urls = await get_seed_urls()
-    print(f"Found {len(seed_urls)} seed URLs.")
+    if args.url:
+        print(f"Single Mode detected. Target: {args.url}")
+        seed_urls = [args.url]
+    else:
+        seed_urls = await get_seed_urls()
+
+    print(f"Found {len(seed_urls)} URL(s) to process.")
 
     # Ensure directories exist
     os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -216,7 +229,9 @@ async def main():
     # Manifest to track all URLs
     crawled_manifest = []
 
+    crawlee_config = Configuration(storage_dir="data/.crawlee")
     crawler = PlaywrightCrawler(
+        configuration=crawlee_config,
         max_requests_per_crawl=40, # Configurable
         headless=True,
     )
@@ -267,17 +282,32 @@ async def main():
     await crawler.run(seed_urls)
 
     # Save JSON Manifest
-    manifest_path = os.path.join(RAW_DIR, "url_manifest.json")
-    final_manifest = {
-        "run_id": RUN_ID,
-        "config": config,
-        "seeds": seed_urls,
-        "items": crawled_manifest,
-        "generated_at": datetime.datetime.now().isoformat()
+    # Save JSON Manifest - Append to master manifest in storage root
+    master_manifest_path = os.path.join(STORAGE_DIR, "manifest.json")
+
+    # Load existing if present
+    if os.path.exists(master_manifest_path):
+        try:
+            with open(master_manifest_path, "r", encoding="utf-8") as f:
+                master_manifest = json.load(f)
+        except:
+            master_manifest = []
+    else:
+        master_manifest = []
+
+    # Create run entry
+    run_entry = {
+         "run_id": RUN_ID,
+         "mode": "single" if args.url else "batch",
+         "config": config,
+         "timestamp": datetime.datetime.now().isoformat(),
+         "items": crawled_manifest
     }
-    with open(manifest_path, "w", encoding="utf-8") as f:
-        json.dump(final_manifest, f, indent=2)
-    print(f"Saved run manifest to {manifest_path}")
+    master_manifest.append(run_entry)
+
+    with open(master_manifest_path, "w", encoding="utf-8") as f:
+        json.dump(master_manifest, f, indent=2)
+    print(f"Updated run manifest at {master_manifest_path}")
 
     print("Extraction Complete.")
 
