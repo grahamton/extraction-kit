@@ -25,3 +25,7 @@ _06_logs/
 
 # Logs
 *.log
+
+# Dependencies
+node_modules/
+
