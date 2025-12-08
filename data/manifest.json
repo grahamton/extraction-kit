@@ -472,5 +472,86 @@
         "processed_at": "2025-12-08T12:14:56.678068"
       }
     ]
+  },
+  {
+    "run_id": "2025-12-08_12-33-29_run",
+    "mode": "single",
+    "config": {
+      "chunking_strategy": "markdown-header",
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-08T12:33:59.407132",
+    "items": [
+      {
+        "url": "https://www.insight.com/en_US/content-and-resources/knowledge-base/myinsight-faqs/pricing-and-payments/online-payments-user-guide.html",
+        "slug": "online-payments-user-guide",
+        "chunks": 1,
+        "status": "success",
+        "processed_at": "2025-12-08T12:33:59.153731"
+      }
+    ]
+  },
+  {
+    "run_id": "2025-12-08_12-38-26_run",
+    "mode": "single",
+    "config": {
+      "chunking_strategy": "markdown-header",
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-08T12:38:56.284258",
+    "items": [
+      {
+        "url": "https://www.insight.com/en_US/content-and-resources/knowledge-base/myinsight-faqs/pricing-and-payments/online-payments-user-guide.html",
+        "slug": "online-payments-user-guide",
+        "chunks": 1,
+        "status": "success",
+        "processed_at": "2025-12-08T12:38:56.007234"
+      }
+    ]
+  },
+  {
+    "run_id": "2025-12-08_12-43-30_run",
+    "mode": "single",
+    "config": {
+      "chunking_strategy": "markdown-header",
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-08T12:44:02.785436",
+    "items": [
+      {
+        "url": "https://www.insight.com/en_US/content-and-resources/knowledge-base/myinsight-faqs/pricing-and-payments/online-payments-user-guide.html",
+        "slug": "online-payments-user-guide",
+        "chunks": 1,
+        "status": "success",
+        "processed_at": "2025-12-08T12:44:02.532082"
+      }
+    ]
   }
 ]
