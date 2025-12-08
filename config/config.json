@@ -1,4 +1,5 @@
 {
+  "chunking_strategy": "markdown-header",
   "allowed_domains": [
     "fergusonhome.com"
   ],

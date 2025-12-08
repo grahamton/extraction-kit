@@ -148,10 +148,37 @@ async def process_and_save(url: str, raw_content: str, manifest: List[Dict]):
     print(f"  -> Saved to {filepath}")
 
     # 5. Chunking
-    print(f"  -> Chunking content...")
-    chunks = re.split(r'\n## ', enriched_output)
+    # 5. Chunking / Saving
+    chunking_strategy = config.get("chunking_strategy", "markdown-header")
 
-    chunk_count = 0
+    # ALWAYS save the full enriched file first (as a failsafe and for reading)
+    full_filename = f"{slug}_full.md"
+    full_filepath = os.path.join(OUTPUT_DIR, full_filename)
+
+    full_frontmatter = f"""---
+title: {slug.replace('-', ' ').title()}
+source_title: {slug}
+url: {url}
+run_id: {RUN_ID}
+tags: [local, extraction, full]
+---
+
+"""
+    with open(full_filepath, "w", encoding="utf-8") as f:
+        f.write(full_frontmatter + enriched_output)
+    print(f"  -> Saved full content to: {full_filename}")
+
+    if chunking_strategy == "none":
+        print(f"  -> Chunking disabled by config.")
+        chunks = []
+
+    else:
+        # Default: markdown-header
+        print(f"  -> Chunking content (Strategy: {chunking_strategy})...")
+        chunks = re.split(r'\n## ', enriched_output)
+
+    if chunks:
+        chunk_count = 0
     for i, chunk in enumerate(chunks):
         if not chunk.strip(): continue
         chunk_count += 1
