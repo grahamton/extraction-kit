@@ -1,9 +1,6 @@
 # Extraction Kit
 
 A **Local AI + Python** pipeline for turning websites into RAG-ready knowledge chunks. Use this to build high-quality context for chatbots and research assistants. Now with a **React Dashboard** for easy management.
-# Extraction Kit
-
-A **Local AI + Python** pipeline for turning websites into RAG-ready knowledge chunks. Use this to build high-quality context for chatbots and research assistants. Now with a **React Dashboard** for easy management.
 
 ## Features
 - **Modern Dashboard:** A sleek React UI to run jobs, view status, and configure settings.
