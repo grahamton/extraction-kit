@@ -13,15 +13,8 @@ __pycache__/
 .crawlee/
 
 # Data & Outputs
-data/
+# data/
 !data/.keep
-
-# Legacy (Just in case)
-storage/
-_02_scrapes_raw/
-_03_scrapes_clean/
-_04_media/
-_06_logs/
 
 # Logs
 *.log

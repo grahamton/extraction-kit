@@ -1,14 +1,19 @@
 # Extraction Kit
 
 A **Local AI + Python** pipeline for turning websites into RAG-ready knowledge chunks. Use this to build high-quality context for chatbots and research assistants. Now with a **React Dashboard** for easy management.
+# Extraction Kit
+
+A **Local AI + Python** pipeline for turning websites into RAG-ready knowledge chunks. Use this to build high-quality context for chatbots and research assistants. Now with a **React Dashboard** for easy management.
 
 ## Features
 - **Modern Dashboard:** A sleek React UI to run jobs, view status, and configure settings.
 - **Local Control:** Runs strictly on your machine.
 - **AI Enrichment:** Uses a local LLM (via LM Studio) to clean and enrich content *before* chunking.
 - **Smart Parsing:** Handles PDFs, removes marketing fluff, and structures metadata (Audience, Intent).
-- **RAG Ready:** Outputs standalone markdown chunks with YAML frontmatter.
-- **Configurable Strategy:** Choose between "Header Split" (for RAG) or "Single File" (for reading).
+- **Unified Synthesis**: Combines web pages and attached PDFs into single, cohesive "Topic Guides" using a dedicated Synthesis Agent.
+- **Smart Chunking**: Automatically merges small, disjointed chunks to ensure every RAG retrieval unit has meaningful context.
+- **RAG Ready**: Outputs standalone markdown chunks with dynamic tags and YAML frontmatter.
+- **Configurable Strategy**: Choose between "Header Split" (for RAG) or "Single File" (for reading).
 
 ## Setup
 
@@ -58,8 +63,8 @@ python local_extraction_runner.py --url https://example.com/page
 All outputs are saved to the `data/` directory.
 
 - **`data/scrapes/{RunID}/clean/`**:
-    - `*_full.md`: The complete enriched document (Always saved).
-    - `*_chunk-XX.md`: Individual chunks split by header (if enabled).
+    - `*_full.md`: The complete enriched document (Always saved, Recommended for GPT-4/Long-Context).
+    - `*_chunk-XX.md`: Smart chunks split by header > 200 chars (if enabled).
 - **`data/scrapes/{RunID}/raw/`**: Raw markdown before AI processing.
 - **`data/media/{RunID}/`**: Archived PDFs and images.
 - **`data/logs/`**: Execution logs.
@@ -70,7 +75,7 @@ All outputs are saved to the `data/` directory.
 You can edit `config/config.json` manually or use the **Settings UI** in the dashboard.
 
 - **`chunking_strategy`**:
-    - `"markdown-header"`: Splits by `## ` (Default).
+    - `"markdown-header"`: Splits by `## ` but merges small orphaned sections (Default).
     - `"none"`: Skips splitting, only saves the full file.
 - **`allowed_domains`**: Whitelist for crawling.
 - **`ignore_patterns`**: URL patterns to skip (e.g., "login", "contact").
@@ -80,9 +85,8 @@ You can edit `config/config.json` manually or use the **Settings UI** in the das
 ```
 extraction-kit/
 ├── dashboard_react/        # React Frontend Application
-├── config/                 # Configuration files
+├── config/                 # Configuration files (synthesis-prompt.md)
 ├── data/                   # ALL outputs (scrapes, logs, media)
-├── templates/              # Prompt templates
 ├── local_extraction_runner.py  # Main Python Pipeline
 ├── server.py               # Flask API wrapper
 └── start_dashboard.bat     # Launcher script

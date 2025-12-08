@@ -87,26 +87,15 @@ def extract_text_from_pdf(url: str, slug: str) -> str:
 async def run_enrichment_agent(content: str, url: str) -> str:
     """Sends content to local LLM for enrichment"""
 
-    prompt_path = os.path.join("config", "multi-url-agent-prompt.md")
+    prompt_path = os.path.join("config", "synthesis-prompt.md")
     if os.path.exists(prompt_path):
         with open(prompt_path, "r", encoding="utf-8") as f:
             system_prompt = f.read()
     else:
-        system_prompt = "Enrich the content."
+        system_prompt = "Synthesize the content."
 
-    # Load and Inject Templates
-    page_template_path = os.path.join("templates", "page-extraction-template.md")
-    pdf_template_path = os.path.join("templates", "pdf-extraction-template.md")
-
-    templates_content = "\n\n# TEMPLATES\n"
-    if os.path.exists(page_template_path):
-        with open(page_template_path, "r", encoding="utf-8") as f:
-            templates_content += f"## Page Template:\n{f.read()}\n"
-    if os.path.exists(pdf_template_path):
-        with open(pdf_template_path, "r", encoding="utf-8") as f:
-            templates_content += f"## PDF Template:\n{f.read()}\n"
-
-    system_prompt += templates_content
+    # Templates are now inherent in the synthesis prompt instruction.
+    # Legacy template injection removed to allow free-flow synthesis.
 
     # Truncate content to avoid context limits.
     # User has 8k context. 14000 chars is approx 3500 tokens.
@@ -129,7 +118,7 @@ async def run_enrichment_agent(content: str, url: str) -> str:
         print(f"LLM Enrichment failed: {e}")
         return f"Error enriching content: {e}"
 
-async def process_and_save(url: str, raw_content: str, manifest: List[Dict]):
+async def process_and_save(url: str, raw_content: str, manifest: List[Dict], config: Dict):
     """Refactored pipeline: Enrich -> Save Raw -> Chunk -> Save Chunks"""
     slug = url.split("/")[-1].replace(".html", "").replace(".pdf", "") or "index"
     if url.lower().endswith(".pdf"):
@@ -147,11 +136,34 @@ async def process_and_save(url: str, raw_content: str, manifest: List[Dict]):
 
     print(f"  -> Saved to {filepath}")
 
-    # 5. Chunking
+    # Extract Metadata Global (Audience, Intent, Tags) used for all chunks
+    audience_match = re.search(r"(?:- )?\**Audience\**:\s*(.*?)(?=\n(?:- |\n|$))", enriched_output, re.IGNORECASE | re.DOTALL)
+    intent_match = re.search(r"(?:- )?\**Intent\**:\s*(.*?)(?=\n(?:- |\n|$))", enriched_output, re.IGNORECASE | re.DOTALL)
+    tags_match = re.search(r"(?:- )?\**Tags\**:\s*\[?(.*?)\]?(?=\n(?:- |\n|$))", enriched_output, re.IGNORECASE | re.DOTALL)
+
+    def clean_meta(text):
+        if not text: return "General"
+        clean = re.sub(r"\*\*|__", "", text)
+        clean = re.sub(r"\n\s*", " ", clean)
+        return clean.strip()
+
+    audience = clean_meta(audience_match.group(1)) if audience_match else "General"
+    intent = clean_meta(intent_match.group(1)) if intent_match else "Inform"
+
+    # Process Tags
+    raw_tags = clean_meta(tags_match.group(1)) if tags_match else "local, extraction"
+    # Ensure it looks like a list
+    if "," in raw_tags and not raw_tags.startswith("["):
+        tags_list = f"[{raw_tags}]"
+    elif not raw_tags.startswith("["):
+        tags_list = f"[{raw_tags}]"
+    else:
+        tags_list = raw_tags
+
     # 5. Chunking / Saving
     chunking_strategy = config.get("chunking_strategy", "markdown-header")
 
-    # ALWAYS save the full enriched file first (as a failsafe and for reading)
+    # ALWAYS save the full enriched file first
     full_filename = f"{slug}_full.md"
     full_filepath = os.path.join(OUTPUT_DIR, full_filename)
 
@@ -160,7 +172,9 @@ title: {slug.replace('-', ' ').title()}
 source_title: {slug}
 url: {url}
 run_id: {RUN_ID}
-tags: [local, extraction, full]
+tags: {tags_list}
+audience: [{audience}]
+intent: [{intent}]
 ---
 
 """
@@ -173,9 +187,40 @@ tags: [local, extraction, full]
         chunks = []
 
     else:
-        # Default: markdown-header
+        # Smart Chunking Strategy
         print(f"  -> Chunking content (Strategy: {chunking_strategy})...")
-        chunks = re.split(r'\n## ', enriched_output)
+        raw_splits = re.split(r'\n## ', enriched_output)
+
+        # Merge buffer for small chunks
+        chunks = []
+        buffer = ""
+
+        for split in raw_splits:
+            if not split.strip(): continue
+
+            # Re-add the header marker removed by split (except for first one potentially)
+            # Actually, re.split removes the delimiter. We assume the delimiter was "## ".
+            # For the first chunk, it might be pre-header text.
+
+            current_text = split if split == raw_splits[0] else f"## {split}"
+
+            # Heuristic: If chunk is < 200 chars, it's likely just a header or empty filler.
+            # Append it to the buffer to be joined with the NEXT chunk content.
+            if len(current_text) < 200:
+                buffer += current_text + "\n\n"
+            else:
+                # If we have a buffer, prepend it to this chunk
+                if buffer:
+                    current_text = buffer + current_text
+                    buffer = ""
+                chunks.append(current_text)
+
+        # If leftovers in buffer, append to last chunk or make new if empty
+        if buffer:
+            if chunks:
+                chunks[-1] += "\n\n" + buffer
+            else:
+                chunks.append(buffer)
 
     if chunks:
         chunk_count = 0
@@ -188,31 +233,20 @@ tags: [local, extraction, full]
         chunk_filename = f"{chunk_slug}.md"
         chunk_path = os.path.join(OUTPUT_DIR, chunk_filename)
 
-        audience_match = re.search(r"(?:- )?\**Audience\**:\s*(.*?)(?=\n(?:- |\n|$))", chunk, re.IGNORECASE | re.DOTALL)
-        intent_match = re.search(r"(?:- )?\**Intent\**:\s*(.*?)(?=\n(?:- |\n|$))", chunk, re.IGNORECASE | re.DOTALL)
-
-        def clean_meta(text):
-            if not text: return "General"
-            clean = re.sub(r"\*\*|__", "", text)
-            clean = re.sub(r"\n\s*", " ", clean)
-            return clean.strip()
-
-        audience = clean_meta(audience_match.group(1)) if audience_match else "General"
-        intent = clean_meta(intent_match.group(1)) if intent_match else "Inform"
-
         frontmatter = f"""---
 title: {slug.replace('-', ' ').title()} - Part {i+1}
 source_title: {slug}
 url: {url}
 section: Part {i+1}
 run_id: {RUN_ID}
-tags: [local, extraction]
+tags: {tags_list}
 audience: [{audience}]
 intent: [{intent}]
 ---
 
 """
-        content_body = f"## {chunk}" if i > 0 else chunk
+        # Note: 'chunk' already contains "## " if it was added in the split logic
+        content_body = chunk
 
         with open(chunk_path, "w", encoding="utf-8") as f:
             f.write(frontmatter + content_body)
@@ -280,7 +314,7 @@ async def main():
             slug = url.split("/")[-1].replace(".pdf", "")
             markdown = extract_text_from_pdf(url, slug)
             if markdown:
-                await process_and_save(url, markdown, crawled_manifest)
+                await process_and_save(url, markdown, crawled_manifest, config)
             else:
                  print(f"Failed to read PDF {url}")
         else:
@@ -295,16 +329,24 @@ async def main():
                     .filter(href => href.toLowerCase().endsWith('.pdf'));
             }""")
 
+            pdf_section_content = ""
+
             for pdf_url in pdf_links:
-                print(f"    -> Found PDF: {pdf_url}. Processing inline...")
-                slug = pdf_url.split("/")[-1].replace(".pdf", "") + "_pdf"
+                print(f"    -> Found PDF: {pdf_url}. Extracting to merge...")
+                slug = pdf_url.split("/")[-1].replace(".pdf", "")
                 pdf_text = extract_text_from_pdf(pdf_url, slug)
                 if pdf_text:
-                     await process_and_save(pdf_url, pdf_text, crawled_manifest)
+                     pdf_section_content += f"\n\n# ATTACHED PDF CONTENT: {slug}\n\n{pdf_text}\n\n---\n"
 
             # 2. Convert to Markdown (Trafilatura)
             markdown = extract(html, output_format="markdown", include_links=True)
-            await process_and_save(url, markdown, crawled_manifest)
+
+            # MERGE: Append PDF content to main markdown
+            if pdf_section_content:
+                print(f"  -> Merging {len(pdf_links)} PDF(s) into main content...")
+                markdown += f"\n\n{pdf_section_content}"
+
+            await process_and_save(url, markdown, crawled_manifest, config)
 
     await crawler.run(seed_urls)
 

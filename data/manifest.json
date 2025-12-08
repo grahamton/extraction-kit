@@ -1,0 +1,476 @@
+[
+  {
+    "run_id": "2025-12-07_11-38-32_run",
+    "mode": "single",
+    "config": {
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-07T11:38:54.206986",
+    "items": [
+      {
+        "url": "https://goembarc.com/blog/how-to-calculate-thc-in-a-joint-weight-potency-and-intake-explained/",
+        "slug": "index",
+        "chunks": 1,
+        "status": "success",
+        "processed_at": "2025-12-07T11:38:53.949663"
+      }
+    ]
+  },
+  {
+    "run_id": "2025-12-07_12-06-06_run",
+    "mode": "batch",
+    "config": {
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-07T12:07:06.535910",
+    "items": [
+      {
+        "url": "https://www.fergusonhome.com/showerhead-buying-guide-a18011/a18011",
+        "slug": "a18011",
+        "chunks": 1,
+        "status": "success",
+        "processed_at": "2025-12-07T12:06:26.794537"
+      },
+      {
+        "url": "https://www.fergusonhome.com/benefits-of-led-lights/a17519",
+        "slug": "a17519",
+        "chunks": 2,
+        "status": "success",
+        "processed_at": "2025-12-07T12:06:42.178184"
+      },
+      {
+        "url": "https://www.fergusonhome.com/how-to-choose-light-switches-dimmers/a13536",
+        "slug": "a13536",
+        "chunks": 1,
+        "status": "success",
+        "processed_at": "2025-12-07T12:07:06.303381"
+      }
+    ]
+  },
+  {
+    "run_id": "2025-12-07_12-11-54_run",
+    "mode": "batch",
+    "config": {
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-07T12:12:30.535261",
+    "items": [
+      {
+        "url": "https://www.fergusonhome.com/benefits-of-led-lights/a17519",
+        "slug": "a17519",
+        "chunks": 2,
+        "status": "success",
+        "processed_at": "2025-12-07T12:12:14.938101"
+      },
+      {
+        "url": "https://www.fergusonhome.com/showerhead-buying-guide-a18011/a18011",
+        "slug": "a18011",
+        "chunks": 2,
+        "status": "success",
+        "processed_at": "2025-12-07T12:12:30.397383"
+      }
+    ]
+  },
+  {
+    "run_id": "2025-12-07_12-18-20_run",
+    "mode": "single",
+    "config": {
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-07T12:18:56.074588",
+    "items": [
+      {
+        "url": "https://www.insight.com/content/dam/global/na/us/pdfs/amd/affordable-server-solutions-for-smbs-and-hosters.pdf",
+        "slug": "affordable-server-solutions-for-smbs-and-hosters_pdf",
+        "chunks": 1,
+        "status": "success",
+        "processed_at": "2025-12-07T12:18:42.678535"
+      },
+      {
+        "url": "https://www.insight.com/en_US/content-and-resources/brands/amd/affordable-server-solutions-for-smbs-and-hosters.html",
+        "slug": "affordable-server-solutions-for-smbs-and-hosters",
+        "chunks": 1,
+        "status": "success",
+        "processed_at": "2025-12-07T12:18:55.827569"
+      }
+    ]
+  },
+  {
+    "run_id": "2025-12-07_13-57-00_run",
+    "mode": "single",
+    "config": {
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-07T13:58:39.484224",
+    "items": [
+      {
+        "url": "https://www.insight.com/content/dam/insight-web/en_US/pdfs/insight/gen-ai-client-zero-insight-cs.pdf",
+        "slug": "gen-ai-client-zero-insight-cs_pdf",
+        "chunks": 8,
+        "status": "success",
+        "processed_at": "2025-12-07T13:57:29.792385"
+      },
+      {
+        "url": "https://www.insight.com/en_US/content-and-resources/case-studies/generative-ai-client-zero-insight-boosts-productivity-to-better-serve-clients.html",
+        "slug": "generative-ai-client-zero-insight-boosts-productivity-to-better-serve-clients",
+        "chunks": 1,
+        "status": "success",
+        "processed_at": "2025-12-07T13:58:02.448142"
+      },
+      {
+        "url": "https://www.insight.com/content/dam/insight-web/en_US/pdfs/insight/gen-ai-client-zero-insight-cs.pdf",
+        "slug": "gen-ai-client-zero-insight-cs_pdf",
+        "chunks": 1,
+        "status": "success",
+        "processed_at": "2025-12-07T13:58:17.271837"
+      },
+      {
+        "url": "https://www.insight.com/en_US/content-and-resources/case-studies/generative-ai-client-zero-insight-boosts-productivity-to-better-serve-clients.html",
+        "slug": "generative-ai-client-zero-insight-boosts-productivity-to-better-serve-clients",
+        "chunks": 1,
+        "status": "success",
+        "processed_at": "2025-12-07T13:58:39.144923"
+      }
+    ]
+  },
+  {
+    "run_id": "2025-12-07_15-45-52_run",
+    "mode": "single",
+    "config": {
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-07T15:46:30.092477",
+    "items": [
+      {
+        "url": "https://support.microsoft.com/en-us/windows/use-voice-typing-to-talk-instead-of-type-on-your-pc-fec94565-c4bd-329d-e59a-af033fa5689f",
+        "slug": "use-voice-typing-to-talk-instead-of-type-on-your-pc-fec94565-c4bd-329d-e59a-af033fa5689f",
+        "chunks": 1,
+        "status": "success",
+        "processed_at": "2025-12-07T15:46:29.804082"
+      }
+    ]
+  },
+  {
+    "run_id": "2025-12-07_15-50-09_run",
+    "mode": "single",
+    "config": {
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-07T15:50:42.466186",
+    "items": []
+  },
+  {
+    "run_id": "2025-12-07_15-53-41_run",
+    "mode": "single",
+    "config": {
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-07T15:54:13.357350",
+    "items": [
+      {
+        "url": "https://www.insight.com/content/dam/global/na/us/pdfs/insight/knowledge-base/insight-renewals-hub-user-guide.pdf",
+        "slug": "insight-renewals-hub-user-guide_pdf",
+        "chunks": 1,
+        "status": "success",
+        "processed_at": "2025-12-07T15:53:58.153160"
+      },
+      {
+        "url": "https://www.insight.com/en_US/content-and-resources/knowledge-base/myinsight-faqs/e-commerce-guides/insight-renewals-hub-user-guide.html",
+        "slug": "insight-renewals-hub-user-guide",
+        "chunks": 7,
+        "status": "success",
+        "processed_at": "2025-12-07T15:54:13.087934"
+      }
+    ]
+  },
+  {
+    "run_id": "2025-12-07_16-42-48_run",
+    "mode": "single",
+    "config": {
+      "chunking_strategy": "markdown-header",
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-07T16:44:20.326341",
+    "items": []
+  },
+  {
+    "run_id": "2025-12-07_18-52-38_run",
+    "mode": "single",
+    "config": {
+      "chunking_strategy": "markdown-header",
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-07T18:54:00.696594",
+    "items": []
+  },
+  {
+    "run_id": "2025-12-07_19-59-20_run",
+    "mode": "single",
+    "config": {
+      "chunking_strategy": "markdown-header",
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-07T20:00:10.103664",
+    "items": []
+  },
+  {
+    "run_id": "2025-12-08_11-37-16_run",
+    "mode": "single",
+    "config": {
+      "chunking_strategy": "markdown-header",
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-08T11:38:22.333789",
+    "items": []
+  },
+  {
+    "run_id": "2025-12-08_11-46-10_run",
+    "mode": "batch",
+    "config": {
+      "chunking_strategy": "markdown-header",
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-08T11:46:47.942623",
+    "items": [
+      {
+        "url": "https://www.fergusonhome.com/showerhead-buying-guide-a18011/a18011",
+        "slug": "a18011",
+        "chunks": 1,
+        "status": "success",
+        "processed_at": "2025-12-08T11:46:47.795172"
+      }
+    ]
+  },
+  {
+    "run_id": "2025-12-08_11-47-46_run",
+    "mode": "single",
+    "config": {
+      "chunking_strategy": "markdown-header",
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-08T11:48:18.589690",
+    "items": [
+      {
+        "url": "https://www.insight.com/content/dam/global/na/us/pdfs/insight/knowledge-base/online-payments-user-guide.pdf",
+        "slug": "online-payments-user-guide_pdf",
+        "chunks": 1,
+        "status": "success",
+        "processed_at": "2025-12-08T11:48:07.453567"
+      },
+      {
+        "url": "https://www.insight.com/en_US/content-and-resources/knowledge-base/myinsight-faqs/pricing-and-payments/online-payments-user-guide.html",
+        "slug": "online-payments-user-guide",
+        "chunks": 1,
+        "status": "success",
+        "processed_at": "2025-12-08T11:48:18.306265"
+      }
+    ]
+  },
+  {
+    "run_id": "2025-12-08_11-57-36_run",
+    "mode": "single",
+    "config": {
+      "chunking_strategy": "markdown-header",
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-08T11:58:08.969967",
+    "items": [
+      {
+        "url": "https://www.insight.com/en_US/content-and-resources/knowledge-base/myinsight-faqs/pricing-and-payments/online-payments-user-guide.html",
+        "slug": "online-payments-user-guide",
+        "chunks": 2,
+        "status": "success",
+        "processed_at": "2025-12-08T11:58:08.713163"
+      }
+    ]
+  },
+  {
+    "run_id": "2025-12-08_12-08-39_run",
+    "mode": "single",
+    "config": {
+      "chunking_strategy": "markdown-header",
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-08T12:09:10.121086",
+    "items": [
+      {
+        "url": "https://www.insight.com/en_US/content-and-resources/knowledge-base/myinsight-faqs/pricing-and-payments/online-payments-user-guide.html",
+        "slug": "online-payments-user-guide",
+        "chunks": 4,
+        "status": "success",
+        "processed_at": "2025-12-08T12:09:09.859463"
+      }
+    ]
+  },
+  {
+    "run_id": "2025-12-08_12-14-16_run",
+    "mode": "single",
+    "config": {
+      "chunking_strategy": "markdown-header",
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-08T12:14:56.925542",
+    "items": [
+      {
+        "url": "https://www.insight.com/en_US/content-and-resources/knowledge-base/myinsight-faqs/pricing-and-payments/online-payments-user-guide.html",
+        "slug": "online-payments-user-guide",
+        "chunks": 1,
+        "status": "success",
+        "processed_at": "2025-12-08T12:14:56.678068"
+      }
+    ]
+  }
+]
