@@ -7,7 +7,9 @@ import argparse
 from typing import List, Dict
 
 # Set shared browser path BEFORE importing crawlee/playwright
-os.environ["PLAYWRIGHT_BROWSERS_PATH"] = r"C:\tools\playwright_browsers"
+# NOTE: For middleware mode, we rely on the default Playwright installation.
+# If you need a custom path at work, uncomment and set this:
+# os.environ["PLAYWRIGHT_BROWSERS_PATH"] = r"C:\tools\playwright_browsers"
 
 # Third party imports
 import requests
