@@ -5,3 +5,5 @@ flask-cors
 trafilatura
 pymupdf
 requests
+streamlit
+openai
