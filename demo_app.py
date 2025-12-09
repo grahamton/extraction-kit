@@ -24,7 +24,7 @@ with st.sidebar.expander("🔌 Azure OpenAI Settings", expanded=False):
     st.caption("Configure these to run enrichment directly in the app.")
     az_key = st.text_input("API Key", type="password", key="az_key")
     az_endpoint = st.text_input("Endpoint", placeholder="https://my-org.openai.azure.com/", key="az_end")
-    az_deployment = st.text_input("Deployment Name", placeholder="gpt-4", key="az_dep")
+    az_deployment = st.text_input("Deployment Name", placeholder="gpt-4", value="gpt-4.1-mini", key="az_dep")
 
 prompt_path = os.path.join("config", "synthesis-prompt.md")
 with st.sidebar.expander("📝 View System Prompt", expanded=False):

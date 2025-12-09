@@ -56,7 +56,7 @@ if __name__ == "__main__":
     # PASTE YOUR CREDENTIALS HERE FOR LOCAL TESTING
     KEY = "paste-your-key-here"
     ENDPOINT = "https://your-org.openai.azure.com/"
-    DEPLOYMENT = "gpt-4"
+    DEPLOYMENT = "gpt-4.1-mini"
 
     if KEY != "paste-your-key-here":
         client = AzureEnrichmentClient(KEY, ENDPOINT, DEPLOYMENT)
