@@ -3,6 +3,7 @@ import subprocess
 import os
 import glob
 import json
+from azure_client_template import AzureEnrichmentClient
 
 # Page Config
 st.set_page_config(
@@ -15,17 +16,25 @@ st.set_page_config(
 st.title("🕸️ Extraction Middleware PoC")
 st.markdown("### Enterprise-Ready Web Scraper & Markdown Converter")
 
-# Sidebar - Config & Prompts
+# Sidebar - Config
 st.sidebar.header("Configuration")
-with st.sidebar.expander("View System Prompt"):
-    prompt_path = os.path.join("config", "synthesis-prompt.md")
+
+# Azure Config Section
+with st.sidebar.expander("🔌 Azure OpenAI Settings", expanded=False):
+    st.caption("Configure these to run enrichment directly in the app.")
+    az_key = st.text_input("API Key", type="password", key="az_key")
+    az_endpoint = st.text_input("Endpoint", placeholder="https://my-org.openai.azure.com/", key="az_end")
+    az_deployment = st.text_input("Deployment Name", placeholder="gpt-4", key="az_dep")
+
+prompt_path = os.path.join("config", "synthesis-prompt.md")
+with st.sidebar.expander("📝 View System Prompt", expanded=False):
     if os.path.exists(prompt_path):
         with open(prompt_path, "r", encoding="utf-8") as f:
             st.sidebar.code(f.read(), language="markdown")
     else:
         st.sidebar.warning("Prompt file not found.")
 
-st.sidebar.info("This demo runs locally. No data is sent to external clouds.")
+st.sidebar.info("This demo runs locally. No data is sent to external clouds (unless you use the Azure Connector).")
 
 # Main Workflow
 col1, col2 = st.columns([2, 1])
@@ -90,23 +99,38 @@ if os.path.exists(scrapes_dir):
                 st.info("No clean files found.")
 
         with tab3:
-            st.markdown("### Ready for Azure OpenAI")
-            st.markdown("The content above is now clean, structured Markdown ready to be sent to the Azure OpenAI API.")
+            st.markdown("### Azure OpenAI Enrichment")
+            st.markdown("Use your corporate Azure OpenAI credentials to synthesize the extracted content below.")
 
-            st.code("""
-# Example Integration
-from azure_client_template import AzureEnrichmentClient
+            # Get the content to start with (Raw or Full)
+            full_files = glob.glob(os.path.join(latest_run, "clean", "*_full.md"))
+            if full_files:
+                with open(full_files[0], "r", encoding="utf-8") as f:
+                    content_to_enrich = f.read()
+            else:
+                content_to_enrich = "No content found."
 
-client = AzureEnrichmentClient(
-    api_key="YOUR_KEY",
-    endpoint="YOUR_ENDPOINT",
-    deployment="gpt-4"
-)
+            st.text_area("Content Preview", value=content_to_enrich[:500]+"...", height=100, disabled=True)
 
-# processed_content comes from the scraper above
-summary = client.enrich_content(processed_content)
-print(summary)
-            """, language="python")
+            enrich_btn = st.button("✨ Synthesize with Azure", disabled=not (az_key and az_endpoint))
+
+            if enrich_btn:
+                if not az_key or not az_endpoint:
+                    st.error("Please configure Azure settings in the Sidebar first.")
+                else:
+                    with st.spinner("Calling Azure OpenAI..."):
+                        client = AzureEnrichmentClient(az_key, az_endpoint, az_deployment or "gpt-4")
+                        summary = client.enrich_content(content_to_enrich)
+
+                        if "Error calling Azure API" in summary:
+                            st.error(summary)
+                        else:
+                            st.success("Enrichment Complete!")
+                            st.markdown("#### Result:")
+                            st.markdown(summary)
+                            st.markdown("---")
+                            with st.expander("View Raw JSON Response"):
+                                st.json({"summary": summary})
 
     else:
         st.info("No runs found yet. Enter a URL above to start.")

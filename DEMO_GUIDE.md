@@ -17,11 +17,13 @@ This branch (`middleware-mode`) is configured as a lightweight middleware layer 
 
 ## 🔌 Connecting to Azure OpenAI
 
-To connect this middleware to your official Work API:
+**No Coding Required!**
+1.  Open the **Sidebar** in the Demo App.
+2.  Expand "Amzure OpenAI Settings".
+3.  Paste your **API Key** and **Endpoint** (and Deployment Name).
+4.  Go to the **"Azure Integration"** tab after a scrape to run the enrichment.
 
-1.  Open `azure_client_template.py`.
-2.  Paste your **API Key** and **Endpoint** in the `if __name__ == "__main__":` block (or import the class into your own script).
-3.  The `demo_app.py` shows how to use this client in the "Azure Integration" tab.
+*Alternatively, you can edit `azure_client_template.py` if you want to hardcode them for scripts.*
 
 ## 📁 Project Structure
 
