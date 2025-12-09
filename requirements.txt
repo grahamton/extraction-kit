@@ -1,0 +1,7 @@
+crawlee
+playwright
+flask
+flask-cors
+trafilatura
+pymupdf
+requests

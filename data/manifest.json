@@ -553,5 +553,32 @@
         "processed_at": "2025-12-08T12:44:02.532082"
       }
     ]
+  },
+  {
+    "run_id": "2025-12-09_10-48-11_run",
+    "mode": "single",
+    "config": {
+      "chunking_strategy": "markdown-header",
+      "allowed_domains": [
+        "fergusonhome.com"
+      ],
+      "ignore_patterns": [
+        "contact",
+        "contact-us",
+        "form"
+      ],
+      "depth_limit": 3,
+      "max_pages": 40
+    },
+    "timestamp": "2025-12-09T10:48:18.865953",
+    "items": [
+      {
+        "url": "https://example.com",
+        "slug": "example.com",
+        "chunks": 1,
+        "status": "success",
+        "processed_at": "2025-12-09T10:48:18.614214"
+      }
+    ]
   }
 ]

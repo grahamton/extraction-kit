@@ -16,11 +16,9 @@ from crawlee.crawlers._playwright import PlaywrightCrawler
 from crawlee.configuration import Configuration
 from typing import Any
 from trafilatura import extract
-from openai import OpenAI
 
 # Configuration
-LM_STUDIO_URL = "http://127.0.0.1:1234/v1"
-MODEL_ID = "qwen/qwen2.5-vl-7b"
+# Removed Local LLM Constants
 TARGETS_DIR = "config"
 
 # Dynamic Run Configuration
@@ -34,8 +32,7 @@ OUTPUT_DIR = os.path.join(STORAGE_DIR, "scrapes", RUN_ID, "clean")
 MEDIA_DIR = os.path.join(STORAGE_DIR, "media", RUN_ID)
 LOGS_DIR = os.path.join(STORAGE_DIR, "logs")
 
-# Initialize OpenAI Client (points to local LM Studio)
-client = OpenAI(base_url=LM_STUDIO_URL, api_key="lm-studio")
+# Initialize OpenAI Client - REMOVED for Middleware Version
 
 def load_config() -> Dict:
     """Loads configuration from _01_targets/config.json"""
@@ -84,128 +81,34 @@ def extract_text_from_pdf(url: str, slug: str) -> str:
         print(f"Error extracting PDF {url}: {e}")
         return ""
 
-async def run_enrichment_agent(content: str, url: str) -> str:
-    """Sends content to local LLM for enrichment"""
-
-    prompt_path = os.path.join("config", "synthesis-prompt.md")
-    if os.path.exists(prompt_path):
-        with open(prompt_path, "r", encoding="utf-8") as f:
-            system_prompt = f.read()
-    else:
-        system_prompt = "Synthesize the content."
-
-    # Templates are now inherent in the synthesis prompt instruction.
-    # Legacy template injection removed to allow free-flow synthesis.
-
-    # Truncate content to avoid context limits.
-    # User has 8k context. 14000 chars is approx 3500 tokens.
-    # This leaves ~4000 tokens for system prompt + response.
-    user_prompt = f"Extract and enrich the following content from {url}:\n\n{content[:14000]}"
-
-    try:
-        completion = client.chat.completions.create(
-            model=MODEL_ID,
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
-            ],
-            temperature=0.8,
-            top_p=0.95,
-            frequency_penalty=1.1,
-        )
-        return completion.choices[0].message.content
-    except Exception as e:
-        print(f"LLM Enrichment failed: {e}")
-        return f"Error enriching content: {e}"
-
 async def process_and_save(url: str, raw_content: str, manifest: List[Dict], config: Dict):
-    """Refactored pipeline: Enrich -> Save Raw -> Chunk -> Save Chunks"""
+    """Refactored pipeline: Raw Scrape -> Save Raw -> Chunk -> Save Chunks"""
     slug = url.split("/")[-1].replace(".html", "").replace(".pdf", "") or "index"
     if url.lower().endswith(".pdf"):
         slug += "_pdf"
 
-    # 3. Enrich with LLM
-    print(f"  -> Enriching content with Local LLM...")
-    enriched_output = await run_enrichment_agent(raw_content, url)
+    # 3. Skip Enrichment (Middleware Mode)
+    # Treat raw_content (Trafilatura output) as the content to process
+    print(f"  -> Processing raw content (Enrichment Skipped)...")
+    content_to_process = raw_content
 
     filename = f"{slug}_raw.md"
     filepath = os.path.join(RAW_DIR, filename)
 
     with open(filepath, "w", encoding="utf-8") as f:
-        f.write(f"Source: {url}\n\n{enriched_output}")
+        f.write(f"Source: {url}\n\n{content_to_process}")
 
     print(f"  -> Saved to {filepath}")
 
-    # Updated Metadata Extraction (Hybrid: JSON -> Regex)
+    # Metadata Defaulting (No LLM to extract these)
     audience = "General"
     intent = "Inform"
     tags_list = "[local, extraction]"
 
-    # Strategy 1: Attempt to find and parse a JSON block
-    json_match = re.search(r"```json\s*(\{.*?\})\s*```", enriched_output, re.DOTALL)
-    json_success = False
-
-    if json_match:
-        try:
-            json_str = json_match.group(1)
-            # Fix trailing commas common in LLM output
-            json_str = re.sub(r",\s*\}", "}", json_str)
-            parsed_data = json.loads(json_str)
-
-            # Helper to stringify lists
-            def fmt_val(v):
-                if isinstance(v, list): return ", ".join(str(x) for x in v)
-                return str(v).strip()
-
-            # Case-insensitive key lookup
-            lookup = {k.lower(): v for k, v in parsed_data.items()}
-
-            if "audience" in lookup: audience = fmt_val(lookup["audience"])
-            if "intent" in lookup: intent = fmt_val(lookup["intent"])
-
-            if "tags" in lookup:
-                raw_tags = fmt_val(lookup["tags"])
-                tags_list = f"[{raw_tags}]"
-
-            json_success = True
-            print("  -> Extracted metadata via JSON block")
-        except Exception as e:
-            print(f"  -> Warning: Failed to parse JSON metadata block: {e}")
-
-    # Strategy 2: Fallback to Regex if JSON failed or not found
-    if not json_success:
-        print("  -> Attempting metadata extraction via Regex...")
-        # Regex handles: * Key: Value  OR  "Key": "Value"  OR  Key: [Value]
-
-        def extract_field(key_name, text):
-            # Matches: (bullet?) (quote?)Key(quote?): (whitespace) (quote/bracket?) Value (quote/bracket?) (newline/comma/end)
-            # Using .format() to avoid f-string curly brace conflicts
-            pattern = r"(?:[-*]\s+)?[\"*]*{}[\"*]*\s*:\s*[\"\[]*(.*?)[\"\]]*(?=\n(?:\s*[-*]|\s*\n|$|\}}\s*,))".format(key_name)
-            match = re.search(pattern, text, re.IGNORECASE | re.DOTALL)
-            return match.group(1).strip() if match else None
-
-        aud_val = extract_field("Audience", enriched_output)
-        int_val = extract_field("Intent", enriched_output)
-        tag_val = extract_field("Tags", enriched_output)
-
-        def clean_meta_text(text):
-            if not text: return None
-            # Remove quotes, brackets if greedy match caught them
-            text = re.sub(r"[{}\"\[\]]", "", text)
-            text = re.sub(r"\*\*|__", "", text)
-            return text.strip()
-
-        if aud_val: audience = clean_meta_text(aud_val) or "General"
-        if int_val: intent = clean_meta_text(int_val) or "Inform"
-
-        if tag_val:
-            raw_t = clean_meta_text(tag_val)
-            if raw_t: tags_list = f"[{raw_t}]"
-
     # 5. Chunking / Saving
     chunking_strategy = config.get("chunking_strategy", "markdown-header")
 
-    # ALWAYS save the full enriched file first
+    # ALWAYS save the full file first
     full_filename = f"{slug}_full.md"
     full_filepath = os.path.join(OUTPUT_DIR, full_filename)
 
@@ -217,11 +120,10 @@ run_id: {RUN_ID}
 tags: {tags_list}
 audience: [{audience}]
 intent: [{intent}]
----
+---\n\n"""
 
-"""
     with open(full_filepath, "w", encoding="utf-8") as f:
-        f.write(full_frontmatter + enriched_output)
+        f.write(full_frontmatter + content_to_process)
     print(f"  -> Saved full content to: {full_filename}")
 
     if chunking_strategy == "none":
@@ -231,7 +133,7 @@ intent: [{intent}]
     else:
         # Smart Chunking Strategy
         print(f"  -> Chunking content (Strategy: {chunking_strategy})...")
-        raw_splits = re.split(r'\n## ', enriched_output)
+        raw_splits = re.split(r'\n## ', content_to_process)
 
         # Merge buffer for small chunks
         chunks = []
@@ -240,24 +142,17 @@ intent: [{intent}]
         for split in raw_splits:
             if not split.strip(): continue
 
-            # Re-add the header marker removed by split (except for first one potentially)
-            # Actually, re.split removes the delimiter. We assume the delimiter was "## ".
-            # For the first chunk, it might be pre-header text.
-
+            # Re-add the header marker
             current_text = split if split == raw_splits[0] else f"## {split}"
 
-            # Heuristic: If chunk is < 200 chars, it's likely just a header or empty filler.
-            # Append it to the buffer to be joined with the NEXT chunk content.
             if len(current_text) < 200:
                 buffer += current_text + "\n\n"
             else:
-                # If we have a buffer, prepend it to this chunk
                 if buffer:
                     current_text = buffer + current_text
                     buffer = ""
                 chunks.append(current_text)
 
-        # If leftovers in buffer, append to last chunk or make new if empty
         if buffer:
             if chunks:
                 chunks[-1] += "\n\n" + buffer
@@ -287,7 +182,6 @@ intent: [{intent}]
 ---
 
 """
-        # Note: 'chunk' already contains "## " if it was added in the split logic
         content_body = chunk
 
         with open(chunk_path, "w", encoding="utf-8") as f:
@@ -309,7 +203,7 @@ async def main():
     parser.add_argument("--url", help="Single URL to scrape (overrides seed file)")
     args = parser.parse_args()
 
-    print(f"Starting Local Extraction Pipeline ({RUN_ID})...")
+    print(f"Starting Local Extraction Pipeline ({RUN_ID}) - MIDDLEWARE MODE")
 
     # Load Config
     config = load_config()
@@ -426,7 +320,7 @@ async def main():
     log_path = os.path.join(LOGS_DIR, "run-log.md")
     timestamp_log = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     log_entry = f"""
-| {timestamp_log} | {len(seed_urls)} Seeds | {MODEL_ID} | {RUN_ID} |
+| {timestamp_log} | {len(seed_urls)} Seeds | Middleware Mode | {RUN_ID} |
 """
     # Ensure log file exists with header if new
     if not os.path.exists(log_path):
